@@ -3,12 +3,11 @@
     padding: 0;
     box-sizing: border-box;
 }
-
 body{
     display: flex;
     justify-content: center; 
     align-items: center;
-    height: 100vh; 
+    min-height: 100vh; 
     background-color: #f4e4ba;
       
 }
@@ -17,7 +16,7 @@ body{
     padding: 22px;
     border-radius: 12px;
     min-height : 45vh;
-    width: 300px;
+    width: 320px;
 
 }
 form{
