@@ -1,41 +1,86 @@
-const BASE_URL = "https://api.exchangerate-api.com/v4/latest/USD";
+const BASE_URL = "https://api.exchangerate-api.com/v4/latest";
 
 const dropdowns = document.querySelectorAll(".dropdown select");
-const btn = document.querySelector("form button");
+const btn = document.querySelector("button");
+const fromCurr = document.querySelector(".from select");
+const toCurr = document.querySelector(".to select");
+const msg = document.querySelector(".msg");
 
+// Fill dropdowns
+for (let select of dropdowns) {
+  for (let currCode in countryList) {
+    let option = document.createElement("option");
+    option.innerText = currCode;
+    option.value = currCode;
 
-
-for(let select of dropdowns) {
-    for (currCode in countryList) {
-    let newOption = document.createElement("option");
-    newOption.innerText = currCode;
-    newOption.value = currCode;
-    if(select.name === "from" && currCode === "USD") {
-        newOption.selected = true;
-    }else if(select.name === "to" && currCode === "PKR") {
-        newOption.selected = true;
+    if (select.name === "from" && currCode === "USD") {
+      option.selected = true;
+    } else if (select.name === "to" && currCode === "PKR") {
+      option.selected = true;
     }
-    select.append(newOption);
- }
 
- select.addEventListener("change",(e) => {
+    select.append(option);
+  }
+
+  select.addEventListener("change", (e) => {
     updateFlag(e.target);
- })
-};
-
-const updateFlag = (element) => {
-    let currCode = element.value;
-    let countryCode = countryList[currCode];
-    let newSrc = `https://flagsapi.com/${countryCode}/flat/64.png`;
-    let img = element.parentElement.querySelector("img");
-    img.src = newSrc; 
-    
-
+  });
 }
 
-btn.addEventListener("click", (e) => {
-    e.preventDefault();
-    let amount = document.querySelector(".amount input");
-    let amtVle = amount.value;
-     
+// Update flag
+function updateFlag(element) {
+  let currCode = element.value;
+  let countryCode = countryList[currCode];
+
+  if (!countryCode) return;
+
+  let img = element.parentElement.querySelector("img");
+  img.src = `https://flagsapi.com/${countryCode}/flat/64.png`;
+}
+
+// Convert currency
+btn.addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  let amountInput = document.querySelector(".amount input");
+  let amtVal = Number(amountInput.value);
+
+  if (!amtVal || amtVal <= 0) {
+    Swal.fire({
+      title: "Invalid Amount",
+      text: "Enter a value greater than 0",
+      icon: "error",
+    });
+    return;
+  }
+
+  const URL = `${BASE_URL}/${fromCurr.value}`;
+
+  try {
+    btn.innerText = "Converting...";
+
+    let response = await fetch(URL);
+    let data = await response.json();
+
+    let rate = data.rates[toCurr.value];
+    let result = amtVal * rate;
+
+    msg.innerText = `${amtVal} ${fromCurr.value} = ${result.toFixed(2)} ${toCurr.value}`;
+
+    Swal.fire({
+      title: "Converted",
+      text: `${result.toFixed(2)} ${toCurr.value}`,
+      icon: "success",
+    });
+
+  } catch (error) {
+    Swal.fire({
+      title: "Error",
+      text: "API not working",
+      icon: "error",
+    });
+
+  } finally {
+    btn.innerText = "Get Exchange Rate";
+  }
 });
