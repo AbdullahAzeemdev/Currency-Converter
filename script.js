@@ -78,7 +78,6 @@ btn.addEventListener("click", async (e) => {
 
     // 🔥 FIXED: 1 currency rate always correct
     msg.innerHTML = `
-      1 ${fromCurr.value} = ${rate.toFixed(4)} ${toCurr.value} <br>
       ${amtVal} ${fromCurr.value} = ${result.toFixed(2)} ${toCurr.value}
     `;
 
