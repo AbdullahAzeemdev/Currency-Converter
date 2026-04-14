@@ -6,7 +6,7 @@ const fromCurr = document.querySelector(".from select");
 const toCurr = document.querySelector(".to select");
 const msg = document.querySelector(".msg");
 
-// 🔽 Fill dropdowns
+// Fill dropdowns
 for (let select of dropdowns) {
   for (let currCode in countryList) {
     let option = document.createElement("option");
@@ -27,7 +27,7 @@ for (let select of dropdowns) {
   });
 }
 
-// 🔽 Update flag
+// Flag update
 function updateFlag(element) {
   let currCode = element.value;
   let countryCode = countryList[currCode];
@@ -38,18 +38,18 @@ function updateFlag(element) {
   img.src = `https://flagsapi.com/${countryCode}/flat/64.png`;
 }
 
-// 🔽 Convert currency
+// Convert currency
 btn.addEventListener("click", async (e) => {
   e.preventDefault();
 
   let amountInput = document.querySelector(".amount input");
   let amtVal = Number(amountInput.value);
 
-  // ❌ Validation fix
+  // validation
   if (isNaN(amtVal) || amtVal <= 0) {
     Swal.fire({
       title: "Invalid Amount",
-      text: "Please enter a value greater than 0",
+      text: "Enter a value greater than 0",
       icon: "error",
     });
     return;
@@ -63,11 +63,9 @@ btn.addEventListener("click", async (e) => {
     let response = await fetch(URL);
     let data = await response.json();
 
-    let fromRate = data.rates[fromCurr.value];
-    let toRate = data.rates[toCurr.value];
+    let rate = data.rates[toCurr.value];
 
-    // 🔥 Safety check
-    if (!toRate || !fromRate) {
+    if (!rate) {
       Swal.fire({
         title: "Error",
         text: "Currency not supported",
@@ -76,13 +74,11 @@ btn.addEventListener("click", async (e) => {
       return;
     }
 
-    // 🔥 Conversion logic
-    let result = amtVal * toRate;
-    let baseResult = amtVal * (toRate / fromRate);
+    let result = amtVal * rate;
 
-    // 🔥 Show both results (your request)
+    // 🔥 FIXED: 1 currency rate always correct
     msg.innerHTML = `
-      1 ${fromCurr.value} = ${(toRate / fromRate).toFixed(4)} ${toCurr.value} <br>
+      1 ${fromCurr.value} = ${rate.toFixed(4)} ${toCurr.value} <br>
       ${amtVal} ${fromCurr.value} = ${result.toFixed(2)} ${toCurr.value}
     `;
 
@@ -95,7 +91,7 @@ btn.addEventListener("click", async (e) => {
   } catch (error) {
     Swal.fire({
       title: "Error",
-      text: "API failed!",
+      text: "API failed",
       icon: "error",
     });
 
